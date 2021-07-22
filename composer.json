@@ -1,0 +1,20 @@
+{
+  "name": "morningtrain/wp-view",
+  "description": "Views using blade",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Morningtrain",
+      "email": "mh@morningtrain.dk"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Morningtrain\\WP\\View\\": "src/"
+    }
+  },
+  "require": {
+    "jenssegers/blade": "v1.4.0"
+  }
+}
