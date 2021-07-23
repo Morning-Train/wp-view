@@ -70,6 +70,10 @@ class View extends AbstractSingleton
     {
         [$package, $viewname] = $this->extractPackageAndTemplateNameFromView($viewTemplateName);
 
+        if (empty($package)) {
+            return $viewname;
+        }
+
         if (empty($package) || !key_exists($package, $this->packages)) {
             throw new MissingPackageException('No such package as "' . $package . '" registered in View');
         }
