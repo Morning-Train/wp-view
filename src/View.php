@@ -8,6 +8,7 @@ use Jenssegers\Blade\Blade;
 use Morningtrain\WP\Core\Abstracts\AbstractSingleton;
 use Morningtrain\WP\Core\Classes\FileSystem;
 use Morningtrain\WP\Core\Traits\FileSystemTrait;
+use Morningtrain\WP\View\Classes\BladeHelper;
 use Morningtrain\WP\View\Exceptions\MissingPackageException;
 
 /**
@@ -22,13 +23,29 @@ class View extends AbstractSingleton
     private Blade $blade;
     private array $packages = [];
 
+
+    /**
+     * Creates a new Blade instance with framework custom directives
+     *
+     * @param string $viewDir
+     * @param string $viewsCacheDir
+     * @return Blade
+     */
+    public function newBlade(string $viewDir, string $viewsCacheDir): Blade
+    {
+        $blade = new Blade($viewDir, $viewsCacheDir);
+        BladeHelper::setup($blade);
+
+        return $blade;
+    }
+
     /** Sets the filesystem for this view. This MUST be called before use (wp-core automatically does this)
      * @param FileSystem $fileSystem
      */
     public function setFileSystem(FileSystem $fileSystem)
     {
         $this->fileSystem = $fileSystem;
-        $this->blade = new Blade($this->viewsDir(), $this->viewsCacheDir());
+        $this->blade = $this->newBlade($this->fileSystem->viewsDir(), $this->fileSystem->viewsCacheDir());
     }
 
     /** Tells the View class where to look for templates in a package and registers this package for use with its own Blade instance.
@@ -43,7 +60,7 @@ class View extends AbstractSingleton
             return false;
         }
 
-        static::getInstance()->packages[$package] = new Blade($dir, $dir . '/Cache');
+        static::getInstance()->packages[$package] = static::getInstance()->newBlade($dir, $dir . '/_cache');
 
         return true;
     }
