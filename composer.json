@@ -15,7 +15,6 @@
     }
   },
   "require": {
-    "jenssegers/blade": "v1.4.0",
-    "morningtrain/wp-core": "dev-master"
+    "duncan3dc/blade": "4.11.0"
   }
 }

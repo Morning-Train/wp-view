@@ -4,7 +4,7 @@
 namespace Morningtrain\WP\View\Classes;
 
 
-use Jenssegers\Blade\Blade;
+use duncan3dc\Laravel\Blade;
 use Morningtrain\WP\View\View;
 
 class BladeHelper

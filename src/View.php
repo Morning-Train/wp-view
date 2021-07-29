@@ -4,7 +4,7 @@
 namespace Morningtrain\WP\View;
 
 
-use Jenssegers\Blade\Blade;
+use duncan3dc\Laravel\Blade;
 use Morningtrain\WP\Core\Abstracts\AbstractSingleton;
 use Morningtrain\WP\Core\Classes\FileSystem;
 use Morningtrain\WP\Core\Traits\FileSystemTrait;
@@ -21,7 +21,6 @@ class View extends AbstractSingleton
 
     private FileSystem $fileSystem;
     private Blade $blade;
-    private array $packages = [];
 
 
     /**
@@ -48,20 +47,18 @@ class View extends AbstractSingleton
         $this->blade = $this->newBlade($this->fileSystem->viewsDir(), $this->fileSystem->viewsCacheDir());
     }
 
-    /** Tells the View class where to look for templates in a package and registers this package for use with its own Blade instance.
+    /** Adds another location for packages to reside
      * You MUST call this early in your package setup!
      * @param string $dir The full path to the Views directory in the package
-     * @param string $package The name of your package eg. wp-package
      * @return bool false if $dir is not a dir
      */
-    public static function loadViewsFrom(string $dir, string $package): bool
+    public static function loadViewsFrom(string $dir): bool
     {
         if (!is_dir($dir)) {
             return false;
         }
 
-        static::getInstance()->packages[$package] = static::getInstance()->newBlade($dir, $dir . '/_cache');
-
+        static::getInstance()->blade->addPath($dir);
         return true;
     }
 
@@ -91,38 +88,10 @@ class View extends AbstractSingleton
             return $viewname;
         }
 
-        if (empty($package) || !key_exists($package, $this->packages)) {
-            throw new MissingPackageException('No such package as "' . $package . '" registered in View');
-        }
-
         $project_view = implode('/', ['vendors', $package, $viewname]);
         $project_file = $this->fileSystem->viewsDir() . '/' . $project_view . '.blade.php';
 
-        return file_exists($project_file) ? $project_view : $viewname;
-    }
-
-    /** Returns the Blade instance by view template name. Project Blade if template exists in project else the package Blade
-     * @param string $viewTemplateName the full name of the template eg. 'template' or 'package::template'
-     * @return string
-     * @throws MissingPackageException
-     */
-    public function getViewTemplateBlade($viewTemplateName): Blade
-    {
-        $default_blade = $this->blade;
-        [$package, $viewname] = $this->extractPackageAndTemplateNameFromView($viewTemplateName);
-
-        if (empty($package)) {
-            return $default_blade;
-        }
-
-        if (!key_exists($package, $this->packages)) {
-            throw new MissingPackageException('No such package as "' . $package . '" registered in View');
-        }
-
-        $project_view = implode('/', ['vendors', $package, $viewname]);
-        $project_file = $this->fileSystem->viewsDir() . '/' . $project_view . '.blade.php';
-
-        return file_exists($project_file) ? $default_blade : $this->packages[$package];
+        return file_exists($project_file) ? $project_view : $package."/".$viewname;
     }
 
     /** Get the Blade instance for View or package
@@ -134,29 +103,19 @@ class View extends AbstractSingleton
     {
         $instance = static::getInstance();
 
-        if ($package === null) {
-            return $instance->blade;
-        }
-
-        if (key_exists($package, $instance->packages)) {
-            return $instance->packages[$package];
-        }
-
-        return null;
+        return $instance->blade;
     }
 
     public static function render(string $view, array $data = [], array $mergeData = []): string
     {
         $viewname = static::getInstance()->getViewTemplateName($view);
-        $blade = static::getInstance()->getViewTemplateBlade($view);
 
-        return $blade->render($viewname, $data, $mergeData);
+        return static::getInstance()->blade->render($viewname, $data, $mergeData);
     }
 
     public static function make($view, $data = [], $mergeData = []): \Illuminate\Contracts\View\View
     {
         $viewname = static::getInstance()->getViewTemplateName($view);
-        $blade = static::getInstance()->getViewTemplateBlade($view);
 
         return $blade->make($viewname, $data, $mergeData);
     }
@@ -164,7 +123,6 @@ class View extends AbstractSingleton
     public function exists($view): bool
     {
         $viewname = static::getInstance()->getViewTemplateName($view);
-        $blade = static::getInstance()->getViewTemplateBlade($view);
 
         return $blade->exists(($viewname));
     }
