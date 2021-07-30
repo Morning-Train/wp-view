@@ -82,49 +82,48 @@ class View extends AbstractSingleton
      */
     public function getViewTemplateName(string $viewTemplateName): string
     {
-        [$package, $viewname] = $this->extractPackageAndTemplateNameFromView($viewTemplateName);
+        [$package, $viewName] = $this->extractPackageAndTemplateNameFromView($viewTemplateName);
 
         if (empty($package)) {
-            return $viewname;
+            return $viewName;
         }
 
-        $project_view = implode('/', ['vendors', $package, $viewname]);
+        $project_view = implode('/', ['vendors', $package, $viewName]);
         $project_file = $this->fileSystem->viewsDir() . '/' . $project_view . '.blade.php';
 
-        return file_exists($project_file) ? $project_view : $package."/".$viewname;
+        return file_exists($project_file) ? $project_view : $package."/".$viewName;
     }
 
-    /** Get the Blade instance for View or package
-     * Using this you can use other Blade methods such as Blade::directive()
-     * @param ?string $package
+    /** Get the Blade instance for View
+     *
      * @return Blade|null
      */
-    public static function blade($package = null): ?Blade
+    public static function blade(): ?Blade
     {
         $instance = static::getInstance();
 
         return $instance->blade;
     }
 
-    public static function render(string $view, array $data = [], array $mergeData = []): string
+    public static function render(string $view, array $data = []): string
     {
-        $viewname = static::getInstance()->getViewTemplateName($view);
+        $viewName = static::getInstance()->getViewTemplateName($view);
 
-        return static::getInstance()->blade->render($viewname, $data, $mergeData);
+        return static::getInstance()->blade->render($viewName, $data);
     }
 
-    public static function make($view, $data = [], $mergeData = []): \Illuminate\Contracts\View\View
+    public static function make($view, $data = []): \Illuminate\Contracts\View\View
     {
-        $viewname = static::getInstance()->getViewTemplateName($view);
+        $viewName = static::getInstance()->getViewTemplateName($view);
 
-        return $blade->make($viewname, $data, $mergeData);
+        return static::getInstance()->blade->make($viewName, $data);
     }
 
     public function exists($view): bool
     {
-        $viewname = static::getInstance()->getViewTemplateName($view);
+        $viewName = static::getInstance()->getViewTemplateName($view);
 
-        return $blade->exists(($viewname));
+        return static::getInstance()->blade->exists(($viewName));
     }
 
 }
