@@ -15,6 +15,6 @@
     }
   },
   "require": {
-    "duncan3dc/blade": "4.11.0"
+    "duncan3dc/blade": "^4.11.0"
   }
 }
