@@ -7,7 +7,7 @@ namespace Morningtrain\WP\View;
 use duncan3dc\Laravel\Blade;
 use Morningtrain\WP\Core\Abstracts\AbstractSingleton;
 use Morningtrain\WP\Core\Classes\FileSystem;
-use Morningtrain\WP\Core\Traits\FileSystemTrait;
+use Morningtrain\WP\Core\Traits\ProjectFileSystemTrait;
 use Morningtrain\WP\View\Classes\BladeHelper;
 use Morningtrain\WP\View\Exceptions\MissingPackageException;
 
@@ -17,9 +17,8 @@ use Morningtrain\WP\View\Exceptions\MissingPackageException;
  */
 class View extends AbstractSingleton
 {
-    use FileSystemTrait;
+    use ProjectFileSystemTrait;
 
-    private FileSystem $fileSystem;
     private Blade $blade;
 
 
@@ -34,17 +33,8 @@ class View extends AbstractSingleton
     {
         $blade = new Blade($viewDir, $viewsCacheDir);
         BladeHelper::setup($blade);
-
+        $this->blade = $blade;
         return $blade;
-    }
-
-    /** Sets the filesystem for this view. This MUST be called before use (wp-core automatically does this)
-     * @param FileSystem $fileSystem
-     */
-    public function setFileSystem(FileSystem $fileSystem)
-    {
-        $this->fileSystem = $fileSystem;
-        $this->blade = $this->newBlade($this->fileSystem->viewsDir(), $this->fileSystem->viewsCacheDir());
     }
 
     /** Adds another location for packages to reside
@@ -89,7 +79,7 @@ class View extends AbstractSingleton
         }
 
         $project_view = implode('/', ['vendors', $package, $viewName]);
-        $project_file = $this->fileSystem->viewsDir() . '/' . $project_view . '.blade.php';
+        $project_file = $this->base_dir.$this->getNamedDir('views') . '/' . $project_view . '.blade.php';
 
         return file_exists($project_file) ? $project_view : $package."/".$viewName;
     }
@@ -108,7 +98,6 @@ class View extends AbstractSingleton
     public static function render(string $view, array $data = []): string
     {
         $viewName = static::getInstance()->getViewTemplateName($view);
-
         return static::getInstance()->blade->render($viewName, $data);
     }
 
