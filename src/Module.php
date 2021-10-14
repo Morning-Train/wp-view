@@ -11,7 +11,7 @@ use Morningtrain\WP\Core\Abstracts\AbstractProject;
  * Class View
  * @package Morningtrain\WP\View
  *
- * @property AbstractProject $context
+ * @property AbstractProject $project_context
  */
 class Module extends AbstractModule
 {
@@ -25,7 +25,7 @@ class Module extends AbstractModule
     {
         parent::init();
 
-        if ($this->context !== null && is_a($this->context, AbstractProject::class)) {
+        if ($this->hasProjectContext()) {
             $this->registerContextAsDefaultViewNamespace();
         }
         // TODO: Implement solution for uses where no context is present
@@ -38,7 +38,7 @@ class Module extends AbstractModule
      */
     public function registerContextAsDefaultViewNamespace()
     {
-        $dir = $this->context->getBaseDir() . $this->context->getNamedDir('views');
+        $dir = $this->project_context->getBaseDir() . $this->project_context->getNamedDir('views');
         View::getInstance()->newBlade($dir, trailingslashit($dir) . "_cache");
         View::loadViewsFrom($dir);
     }
