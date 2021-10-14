@@ -17,7 +17,15 @@ use Morningtrain\WP\View\Exceptions\MissingPackageException;
 class View extends AbstractSingleton
 {
     private Blade $blade;
+    /**
+     * The full path to the views directory
+     * @var string|null $base_dir
+     */
     private ?string $base_dir = null;
+    /**
+     * The full path to the views cache directory
+     * @var string|null $base_dir
+     */
     private ?string $cache_dir = null;
 
 
@@ -32,14 +40,17 @@ class View extends AbstractSingleton
     {
         $this->base_dir = $viewDir;
         $this->cache_dir = $viewsCacheDir;
+
         $blade = new Blade($this->base_dir, $this->cache_dir);
         BladeHelper::setup($blade);
         $this->blade = $blade;
+
         return $blade;
     }
 
     /** Adds another location for packages to reside
      * You MUST call this early in your package setup!
+     *
      * @param string $dir The full path to the Views directory in the package
      * @return bool false if $dir is not a dir
      */
@@ -50,9 +61,18 @@ class View extends AbstractSingleton
         }
 
         static::getInstance()->blade->addPath($dir);
+
         return true;
     }
 
+    /**
+     * Register a namespace for blade
+     *
+     * @param string $namespace The namespace name. Eg. wp-package for accessing templates as "wp-package::template-name"
+     * @param string $hints The absolute path for the views directory for your namespace
+     * @return BladeInterface
+     * @throws \ReflectionException
+     */
     public static function addNamespace(string $namespace, $hints): BladeInterface
     {
         return static::getInstance()->blade->addNamespace($namespace, $hints);
@@ -71,7 +91,8 @@ class View extends AbstractSingleton
         return explode('::', $viewTemplateName, 2);
     }
 
-    /** Returns the full template name by view template name. Eg. package::template could return 'vendors/package/template' if there is a template in the current project
+    /**
+     * Returns the full template name by view template name. Eg. package::template could return 'vendors/package/template' if there is a template in the current project
      *
      * @param string $viewTemplateName the full name of the template eg. 'template' or 'package::template'
      * @return string
@@ -95,7 +116,8 @@ class View extends AbstractSingleton
         return file_exists($project_file) ? $project_view : $viewTemplateName;
     }
 
-    /** Get the Blade instance for View
+    /**
+     * Get the Blade instance for View
      *
      * @return Blade|null
      */
@@ -106,12 +128,35 @@ class View extends AbstractSingleton
         return $instance->blade;
     }
 
+    /**
+     * Render (return) the template view
+     *
+     * @see https://laravel.com/docs/views#creating-and-rendering-views
+     *
+     * @param string $view
+     * @param array $data
+     * @return string
+     * @throws MissingPackageException
+     * @throws \ReflectionException
+     */
     public static function render(string $view, array $data = []): string
     {
         $viewName = static::getInstance()->getViewTemplateName($view);
         return static::getInstance()->blade->render($viewName, $data);
     }
 
+    /**
+     * Make the view instance.
+     * You can use this for other views
+     *
+     * @see https://laravel.com/docs/views#creating-and-rendering-views
+     *
+     * @param $view
+     * @param array $data
+     * @return \Illuminate\Contracts\View\View
+     * @throws MissingPackageException
+     * @throws \ReflectionException
+     */
     public static function make($view, $data = []): \Illuminate\Contracts\View\View
     {
         $viewName = static::getInstance()->getViewTemplateName($view);
@@ -119,6 +164,14 @@ class View extends AbstractSingleton
         return static::getInstance()->blade->make($viewName, $data);
     }
 
+    /**
+     * Determine if a given view exists
+     *
+     * @param $view
+     * @return bool
+     * @throws MissingPackageException
+     * @throws \ReflectionException
+     */
     public function exists($view): bool
     {
         $viewName = static::getInstance()->getViewTemplateName($view);
