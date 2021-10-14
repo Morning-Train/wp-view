@@ -15,6 +15,11 @@ use Morningtrain\WP\Core\Abstracts\AbstractProject;
  */
 class Module extends AbstractModule
 {
+    /**
+     * This is not a normal module so don't load views as normal
+     * @var bool
+     */
+    protected bool $use_views = false;
 
     /**
      * Initializes the module
