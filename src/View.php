@@ -5,9 +5,8 @@ namespace Morningtrain\WP\View;
 
 
 use duncan3dc\Laravel\Blade;
+use duncan3dc\Laravel\BladeInterface;
 use Morningtrain\WP\Core\Abstracts\AbstractSingleton;
-use Morningtrain\WP\Core\Classes\FileSystem;
-use Morningtrain\WP\Core\Traits\ProjectFileSystemTrait;
 use Morningtrain\WP\View\Classes\BladeHelper;
 use Morningtrain\WP\View\Exceptions\MissingPackageException;
 
@@ -17,9 +16,9 @@ use Morningtrain\WP\View\Exceptions\MissingPackageException;
  */
 class View extends AbstractSingleton
 {
-    use ProjectFileSystemTrait;
-
     private Blade $blade;
+    private ?string $base_dir = null;
+    private ?string $cache_dir = null;
 
 
     /**
@@ -31,7 +30,9 @@ class View extends AbstractSingleton
      */
     public function newBlade(string $viewDir, string $viewsCacheDir): Blade
     {
-        $blade = new Blade($viewDir, $viewsCacheDir);
+        $this->base_dir = $viewDir;
+        $this->cache_dir = $viewsCacheDir;
+        $blade = new Blade($this->base_dir, $this->cache_dir);
         BladeHelper::setup($blade);
         $this->blade = $blade;
         return $blade;
@@ -52,6 +53,11 @@ class View extends AbstractSingleton
         return true;
     }
 
+    public static function addNamespace(string $namespace, $hints): BladeInterface
+    {
+        return static::getInstance()->blade->addNamespace($namespace, $hints);
+    }
+
     /** Extracts package string and template name for a template and returns this as [string|NULL $package, string $view]
      * @param string $viewTemplateName
      * @return array
@@ -66,6 +72,7 @@ class View extends AbstractSingleton
     }
 
     /** Returns the full template name by view template name. Eg. package::template could return 'vendors/package/template' if there is a template in the current project
+     *
      * @param string $viewTemplateName the full name of the template eg. 'template' or 'package::template'
      * @return string
      * @throws MissingPackageException
@@ -74,14 +81,18 @@ class View extends AbstractSingleton
     {
         [$package, $viewName] = $this->extractPackageAndTemplateNameFromView($viewTemplateName);
 
+        // If view name does not contain a namespace then use it as it is.
         if (empty($package)) {
-            return $viewName;
+            return $viewTemplateName;
         }
 
+        // The view name if it would exist in project
         $project_view = implode('/', ['vendors', $package, $viewName]);
-        $project_file = $this->base_dir.$this->getNamedDir('views') . '/' . $project_view . '.blade.php';
+        // The full view file path if it would exist in project
+        $project_file = trailingslashit($this->base_dir) . $project_view . '.blade.php';
 
-        return file_exists($project_file) ? $project_view : $package."/".$viewName;
+        // If view file exists in project then return this view. If not then use view as is
+        return file_exists($project_file) ? $project_view : $viewTemplateName;
     }
 
     /** Get the Blade instance for View
