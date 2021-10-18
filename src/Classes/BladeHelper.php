@@ -5,28 +5,20 @@ namespace Morningtrain\WP\View\Classes;
 
 
 use duncan3dc\Laravel\Blade;
+use Morningtrain\WP\Core\Classes\ClassLoader;
+use Morningtrain\WP\View\Abstracts\AbstractDirective;
 use Morningtrain\WP\View\View;
+use Symfony\Component\Finder\Finder;
 
 class BladeHelper
 {
     /**
      * Sets up a Blade instance
      *
-     * @param Blade $blade
      */
-    public static function setup(Blade &$blade)
+    public static function setup()
     {
-        static::addDefaultDirectives($blade);
-    }
-
-    /**
-     * Adds all default directives to a Blade instance
-     *
-     * @param Blade $blade
-     */
-    public static function addDefaultDirectives(Blade &$blade)
-    {
-        static::addPostLoopDirective($blade);
+        static::loadDirectives();
     }
 
     /**
@@ -42,5 +34,26 @@ class BladeHelper
                 return View::make('wp-core::theloop', ['template' => $expression]);
             }
         );
+    }
+
+
+    /**
+     * Loads and registers all standard Directives
+     */
+    public static function loadDirectives()
+    {
+        $finder = new Finder();
+        $finder->files()->name('*.php')->in(dirname(__DIR__) . "/Directives");
+
+        if (!$finder->hasResults()) {
+            return;
+        }
+
+        $directive_files = [];
+        foreach ($finder as $file) {
+            $directive_files[] = $file->getRealPath();
+        }
+
+        ClassLoader::requireAndCall($directive_files,'register', null, AbstractDirective::class);
     }
 }

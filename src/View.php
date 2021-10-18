@@ -42,8 +42,8 @@ class View extends AbstractSingleton
         $this->cache_dir = $viewsCacheDir;
 
         $blade = new Blade($this->base_dir, $this->cache_dir);
-        BladeHelper::setup($blade);
         $this->blade = $blade;
+        BladeHelper::setup();
 
         return $blade;
     }
