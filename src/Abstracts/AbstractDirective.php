@@ -6,7 +6,7 @@ namespace Morningtrain\WP\View\Abstracts;
 
 use Morningtrain\WP\View\View;
 
-class AbstractDirective
+abstract class AbstractDirective
 {
     protected $method = "directive";
 
