@@ -172,7 +172,7 @@ class View extends AbstractSingleton
      * @throws MissingPackageException
      * @throws \ReflectionException
      */
-    public function exists($view): bool
+    public static function exists($view): bool
     {
         $viewName = static::getInstance()->getViewTemplateName($view);
 
