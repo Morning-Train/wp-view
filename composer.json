@@ -3,7 +3,7 @@
   "description": "Views using blade",
   "minimum-stability": "stable",
   "license": "proprietary",
-  "version": "v0.1.2",
+  "version": "v0.1.4",
   "authors": [
     {
       "name": "Morningtrain",

@@ -11,7 +11,7 @@ class UserName extends \Morningtrain\WP\View\Abstracts\AbstractDirective
         if (!is_user_logged_in()) {
             return '';
         }
-        
-        return "<?php wp_get_current_user()->display_name; ?>";
+
+        return "<?php echo wp_get_current_user()->display_name; ?>";
     }
 }
