@@ -8,6 +8,10 @@
     {
       "name": "Morningtrain",
       "email": "mh@morningtrain.dk"
+    },
+    {
+      "name": "Martin Schadegg Brønniche",
+      "email": "ms@morningtrain.dk"
     }
   ],
   "autoload": {
