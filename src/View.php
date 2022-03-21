@@ -4,8 +4,8 @@
 namespace Morningtrain\WP\View;
 
 
-use duncan3dc\Laravel\Blade;
-use duncan3dc\Laravel\BladeInterface;
+use Morningtrain\WP\View\Blade\Blade;
+use Morningtrain\WP\View\Blade\BladeInterface;
 use Morningtrain\WP\Core\Abstracts\AbstractSingleton;
 use Morningtrain\WP\View\Classes\BladeHelper;
 use Morningtrain\WP\View\Exceptions\MissingPackageException;
