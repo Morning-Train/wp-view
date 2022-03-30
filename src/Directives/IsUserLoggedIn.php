@@ -10,6 +10,6 @@ class IsUserLoggedIn extends \Morningtrain\WP\View\Abstracts\AbstractDirective
 
     public function handle(?string $expression = null): string
     {
-        return is_user_logged_in();
+        return "<php is_user_logged_in() ?>";
     }
 }
