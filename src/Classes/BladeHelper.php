@@ -4,7 +4,7 @@
 namespace Morningtrain\WP\View\Classes;
 
 
-use duncan3dc\Laravel\Blade;
+use Morningtrain\WP\View\Blade\Blade;
 use Morningtrain\WP\Core\Classes\ClassLoader;
 use Morningtrain\WP\View\Abstracts\AbstractDirective;
 use Morningtrain\WP\View\View;
