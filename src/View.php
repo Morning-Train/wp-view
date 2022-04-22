@@ -145,6 +145,11 @@ class View extends AbstractSingleton
         return static::getInstance()->blade->render($viewName, $data);
     }
 
+    public static function composer(string $key, $value): array
+    {
+        return static::getInstance()->blade->composer($key, $value);
+    }
+
     /**
      * Make the view instance.
      * You can use this for other views
