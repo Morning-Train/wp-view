@@ -6,6 +6,14 @@
 
     class Footer extends \Morningtrain\WP\View\Abstracts\AbstractDirective
     {
+        /**
+         * Render the footer template
+         *
+         * @see get_footer
+         * @param string|null $name
+         *
+         * @return string
+         */
         public function handle(?string $name = ''): string
         {
             $action = empty($name) ? "\do_action('get_footer');" : "\do_action('get_footer', '$name');";

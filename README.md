@@ -45,6 +45,13 @@ Checks current user capabilities Note: that @auth uses is_user_logged_in and cur
 @endauth
 ```
 
+### @react
+Outputs markup ready for react initialization using our React Renderer
+```html
+@react('MyComponent', ['someProp' => 'some value'])
+// Will return: 
+<div data-react-class="MyComponent" data-react-props='{"someProp": "some value"}'></div>
+```
 ### @username
 
 ```html
