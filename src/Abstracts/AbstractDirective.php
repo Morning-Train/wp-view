@@ -1,36 +1,38 @@
 <?php
 
 
-namespace Morningtrain\WP\View\Abstracts;
+    namespace Morningtrain\WP\View\Abstracts;
 
 
-use Morningtrain\WP\View\View;
+    use Morningtrain\WP\View\Classes\DirectiveHelper;
+    use Morningtrain\WP\View\View;
 
-abstract class AbstractDirective
-{
-    protected $method = "directive";
-
-
-    public function register()
+    /**
+     * @method handle
+     */
+    abstract class AbstractDirective
     {
-        View::blade()->{$this->method}($this->getDirectiveName(), [$this, 'cleanupExpressionAndThenHandle']);
-    }
+        protected $method = "directive";
 
-    public function getDirectiveName(): string
-    {
-        $r = new \ReflectionClass($this);
-        return mb_strtolower($r->getShortName());
-    }
 
-    public function cleanupExpressionAndThenHandle(?string $expression = null)
-    {
-        $expression = trim($expression, '"\'');
-        return $this->handle($expression);
-    }
+        public function register()
+        {
+            View::blade()->{$this->method}($this->getDirectiveName(), [$this, 'cleanupExpressionAndThenHandle']);
+        }
 
-    public function handle(?string $expression = null): string
-    {
-        $directive = $this->getDirectiveName();
-        return "Directive \"{$directive}\" is missing handle function.";
+        public function getDirectiveName(): string
+        {
+            $r = new \ReflectionClass($this);
+            return mb_strtolower($r->getShortName());
+        }
+
+        public function cleanupExpressionAndThenHandle(?string $expression = null)
+        {
+            return $this->handle(...$this->parseExpression($expression));
+        }
+
+        public function parseExpression(?string $expression = null): array
+        {
+            return [trim($expression, '"\' ')];
+        }
     }
-}
