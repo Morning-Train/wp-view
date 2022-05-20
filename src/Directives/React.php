@@ -2,8 +2,6 @@
 
 namespace Morningtrain\WP\View\Directives;
 
-use Morningtrain\WP\View\Classes\ReactComponent;
-
 class React extends \Morningtrain\WP\View\Abstracts\AbstractDirective
 {
   public function parseExpression (?string $expression = null): array
@@ -22,6 +20,6 @@ class React extends \Morningtrain\WP\View\Abstracts\AbstractDirective
    */
   public function handle (string $expression): string
   {
-    return "<?php echo ReactComponent::render($expression) ?>";
+    return "<?php echo Morningtrain\WP\View\Classes\ReactComponent::render($expression) ?>";
   }
 }
