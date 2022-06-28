@@ -1,49 +1,50 @@
-<?php namespace Morningtrain\WP\View\Blade;
+<?php
+    namespace Morningtrain\WP\View\Blade;
 
-class ConditionHandler
-{
-/**
-* @var array $conditions The conditions registered.
-*/
-private $conditions = [];
-
-
-/**
-* Register an custom conditional directive.
-*
-* @param string $name
-* @param callable $handler
-*
-* @return $this
-*/
-public function add(string $name, callable $handler): ConditionHandler
-{
-if (array_key_exists($name, $this->conditions)) {
-throw new \UnexpectedValueException("A conditional by this name already exists: @{$name}");
-}
-
-$this->conditions[$name] = $handler;
-
-return $this;
-}
+    class ConditionHandler
+    {
+        /**
+         * @var array $conditions The conditions registered.
+         */
+        private $conditions = [];
 
 
-/**
-* Call a registered conditional directive.
-*
-* @param string $name
-* @param mixed ...$params
-*
-* @return mixed
-*/
-public function check(string $name, ...$params)
-{
-if (!array_key_exists($name, $this->conditions)) {
-throw new \UnexpectedValueException("Unknown conditional: @{$name}");
-}
+        /**
+         * Register an custom conditional directive.
+         *
+         * @param string $name
+         * @param callable $handler
+         *
+         * @return $this
+         */
+        public function add(string $name, callable $handler): ConditionHandler
+        {
+            if (array_key_exists($name, $this->conditions)) {
+                throw new \UnexpectedValueException("A conditional by this name already exists: @{$name}");
+            }
 
-$function = $this->conditions[$name];
+            $this->conditions[$name] = $handler;
 
-return $function(...$params);
-}
-}
+            return $this;
+        }
+
+
+        /**
+         * Call a registered conditional directive.
+         *
+         * @param string $name
+         * @param mixed ...$params
+         *
+         * @return mixed
+         */
+        public function check(string $name, ...$params)
+        {
+            if (!array_key_exists($name, $this->conditions)) {
+                throw new \UnexpectedValueException("Unknown conditional: @{$name}");
+            }
+
+            $function = $this->conditions[$name];
+
+            return $function(...$params);
+        }
+    }
