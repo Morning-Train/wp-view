@@ -33,12 +33,12 @@
          * Creates a new Blade instance with framework custom directives
          *
          * @param string $viewDir
-         * @param string $viewsCacheDir
+         * @param ?string $viewsCacheDir
          */
-        public static function setup(string $viewDir, string $viewsCacheDir)
+        public static function setup(string $viewDir, ?string $viewsCacheDir = null)
         {
             static::$baseDir = $viewDir;
-            static::$cacheDir = $viewsCacheDir;
+            static::$cacheDir = $viewsCacheDir !== null ? $viewsCacheDir : trailingslashit($viewDir) . "_cache";
 
             Blade::setInstance(new BladeInstance(static::$baseDir, static::$cacheDir));
 

@@ -7,6 +7,12 @@ You can use `Morningtrain\WP\View\View` the same way as you would use the View c
 To render a view in a non-blade context use the View::render method.
 
 ```php
+    View::setup(__DIR__ . '/resources/views', __DIR__ . '/resources/views/_cache');
+// or 
+    View::setup(__DIR__ . '/resources/views'); // Since cache default to /_cache relative to the views dir
+```
+
+```php
 // In Controller, Hook or WordPress template file
 use Morningtrain\WP\View\View;
 // This will render the person view with the variable $name set as "John Edward"
@@ -46,12 +52,15 @@ Checks current user capabilities Note: that @auth uses is_user_logged_in and cur
 ```
 
 ### @react
+
 Outputs markup ready for react initialization using our React Renderer
+
 ```html
 @react('MyComponent', ['someProp' => 'some value'])
-// Will return: 
+// Will return:
 <div data-react-class="MyComponent" data-react-props='{"someProp": "some value"}'></div>
 ```
+
 ### @username
 
 ```html
@@ -98,24 +107,3 @@ It is recommended that you do this in a Hook using init on a lower priority than
             });
 ```
 
-## Packages
-
-To use views in a package you must first register your package into View.
-
-```php
-// PackageClass.php
-class PackageClass{
-    public static function init(){
-        View::loadViewsFrom(__DIR__ . "/Views",'my-package');
-    } 
-}
-```
-
-To use a template from a package, whether you are working in this package or in the project use:
-
-```php
-    View::render('my-package::person',['name' => 'Svante']);
-```
-
-If you need to use a custom template instead of the one the package introduces then you can simply add your own template
-in your project eg. `Views/vendors/my-package/person.blade.php`
