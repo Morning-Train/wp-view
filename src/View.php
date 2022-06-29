@@ -123,4 +123,18 @@
             return Blade::exists($view);
         }
 
+        /**
+         * Get the first view that actually exists from the given list.
+         *
+         * @param array $views The views to look for
+         * @param array $data The parameters to pass to the view
+         * @param array $mergeData The extra data to merge
+         *
+         * @return \Illuminate\Contracts\View\View The generated view
+         */
+        public static function first(array $views, $data = [], $mergeData = []): \Illuminate\Contracts\View\View
+        {
+            return Blade::first($views, $data, $mergeData);
+        }
+
     }
