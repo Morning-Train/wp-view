@@ -107,3 +107,22 @@ It is recommended that you do this in a Hook using init on a lower priority than
             });
 ```
 
+## Namespacing
+
+```php
+// Render a view called view from the foo namespace
+echo \Morningtrain\WP\View\View::render('foo::view')
+@include('foo::view')
+```
+
+```php
+// Add a namespace
+\Morningtrain\WP\View\View::addNamespace('foo',__DIR__ . '/views');
+```
+
+```php
+// Render a namespaced view, but prioritize the project vendor directory 
+// This is useful when creating a standalone block in a package or a module of sorts
+// This tells blade to render the first view it finds. So if the view in vendor exists it will be used
+echo \Morningtrain\WP\View\View::first('vendor/foo/view','foo::view');
+```
