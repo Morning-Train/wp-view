@@ -27,7 +27,7 @@ To use the tool have a look at [Usage](#usage)
 Install with composer
 
 ```bash
-composer require morningtrain/wp-route
+composer require morningtrain/wp-view
 ```
 
 ## Dependencies
