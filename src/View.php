@@ -1,187 +1,140 @@
 <?php
 
 
-namespace Morningtrain\WP\View;
+    namespace Morningtrain\WP\View;
 
 
-use Morningtrain\WP\View\Blade\Blade;
-use Morningtrain\WP\View\Blade\BladeInterface;
-use Morningtrain\WP\Core\Abstracts\AbstractSingleton;
-use Morningtrain\WP\View\Classes\BladeHelper;
-use Morningtrain\WP\View\Exceptions\MissingPackageException;
-
-/**
- * Class View
- * @package Morningtrain\WP\View
- */
-class View extends AbstractSingleton
-{
-    private Blade $blade;
-    /**
-     * The full path to the views directory
-     * @var string|null $base_dir
-     */
-    private ?string $base_dir = null;
-    /**
-     * The full path to the views cache directory
-     * @var string|null $base_dir
-     */
-    private ?string $cache_dir = null;
-
+    use Morningtrain\PHPLoader\Loader;
+    use Morningtrain\WP\View\Blade\Blade;
+    use Morningtrain\WP\View\Blade\BladeInstance;
+    use Morningtrain\WP\View\Blade\BladeInterface;
+    use Morningtrain\WP\View\Classes\BladeHelper;
+    use Morningtrain\WP\View\Exceptions\MissingPackageException;
 
     /**
-     * Creates a new Blade instance with framework custom directives
-     *
-     * @param string $viewDir
-     * @param string $viewsCacheDir
-     * @return Blade
+     * Class View
+     * @package Morningtrain\WP\View
      */
-    public function newBlade(string $viewDir, string $viewsCacheDir): Blade
+    class View
     {
-        $this->base_dir = $viewDir;
-        $this->cache_dir = $viewsCacheDir;
+        /**
+         * The full path to the views directory
+         * @var string|null $baseDir
+         */
+        private static ?string $baseDir = null;
+        /**
+         * The full path to the views cache directory
+         * @var string|null $cacheDir
+         */
+        private static ?string $cacheDir = null;
 
-        $blade = new Blade($this->base_dir, $this->cache_dir);
-        $this->blade = $blade;
-        BladeHelper::setup();
 
-        return $blade;
-    }
+        /**
+         * Creates a new Blade instance with framework custom directives
+         *
+         * @param string $viewDir
+         * @param ?string $viewsCacheDir
+         */
+        public static function setup(string $viewDir, ?string $viewsCacheDir = null)
+        {
+            static::$baseDir = $viewDir;
+            static::$cacheDir = $viewsCacheDir !== null ? $viewsCacheDir : trailingslashit($viewDir) . "_cache";
 
-    /** Adds another location for packages to reside
-     * You MUST call this early in your package setup!
-     *
-     * @param string $dir The full path to the Views directory in the package
-     * @return bool false if $dir is not a dir
-     */
-    public static function loadViewsFrom(string $dir): bool
-    {
-        if (!is_dir($dir)) {
-            return false;
+            Blade::setInstance(new BladeInstance(static::$baseDir, static::$cacheDir));
+
+            Loader::create(__DIR__ . '/directives');
         }
 
-        static::getInstance()->blade->addPath($dir);
-
-        return true;
-    }
-
-    /**
-     * Register a namespace for blade
-     *
-     * @param string $namespace The namespace name. Eg. wp-package for accessing templates as "wp-package::template-name"
-     * @param string $hints The absolute path for the views directory for your namespace
-     * @return BladeInterface
-     * @throws \ReflectionException
-     */
-    public static function addNamespace(string $namespace, $hints): BladeInterface
-    {
-        return static::getInstance()->blade->addNamespace($namespace, $hints);
-    }
-
-    /** Extracts package string and template name for a template and returns this as [string|NULL $package, string $view]
-     * @param string $viewTemplateName
-     * @return array
-     */
-    public function extractPackageAndTemplateNameFromView(string $viewTemplateName): array
-    {
-        if (!strpos($viewTemplateName, '::')) {
-            return [null, $viewTemplateName];
+        /**
+         * Register a namespace for blade
+         *
+         * @param string $namespace The namespace name. Eg. wp-package for accessing templates as "wp-package::template-name"
+         * @param string $path The absolute path for the views directory for your namespace
+         * @return BladeInterface
+         */
+        public static function addNamespace(string $namespace, string $path): BladeInterface
+        {
+            return Blade::addNamespace($namespace, $path);
         }
 
-        return explode('::', $viewTemplateName, 2);
-    }
-
-    /**
-     * Returns the full template name by view template name. Eg. package::template could return 'vendors/package/template' if there is a template in the current project
-     *
-     * @param string $viewTemplateName the full name of the template eg. 'template' or 'package::template'
-     * @return string
-     * @throws MissingPackageException
-     */
-    public function getViewTemplateName(string $viewTemplateName): string
-    {
-        [$package, $viewName] = $this->extractPackageAndTemplateNameFromView($viewTemplateName);
-
-        // If view name does not contain a namespace then use it as it is.
-        if (empty($package)) {
-            return $viewTemplateName;
+        /**
+         * Get the Blade instance for View
+         *
+         * @return BladeInterface|null
+         */
+        public static function blade(): ?BladeInterface
+        {
+            return Blade::getInstance();
         }
 
-        // The view name if it would exist in project
-        $project_view = implode('/', ['vendors', $package, $viewName]);
-        // The full view file path if it would exist in project
-        $project_file = trailingslashit($this->base_dir) . $project_view . '.blade.php';
+        /**
+         * Render (return) the template view
+         *
+         * @see https://laravel.com/docs/views#creating-and-rendering-views
+         *
+         * @param string $view
+         * @param array $data
+         *
+         * @see https://laravel.com/docs/9.x/views#view-composers
+         *
+         * @return string
+         */
+        public static function render(string $view, array $data = []): string
+        {
+            return Blade::render($view, $data);
+        }
 
-        // If view file exists in project then return this view. If not then use view as is
-        return file_exists($project_file) ? $project_view : $viewTemplateName;
+        /**
+         * Register a composer.
+         *
+         * @param string $key The name of the composer to register
+         * @param mixed $value The closure or class to use
+         *
+         * @return array
+         */
+        public static function composer(string $key, $value): array
+        {
+            return Blade::composer($key, $value);
+        }
+
+        /**
+         * Make the view instance.
+         * You can use this for other views
+         *
+         * @see https://laravel.com/docs/views#creating-and-rendering-views
+         *
+         * @param string $view
+         * @param array $data
+         * @return \Illuminate\Contracts\View\View
+         */
+        public static function make(string $view, array $data = []): \Illuminate\Contracts\View\View
+        {
+            return Blade::make($view, $data);
+        }
+
+        /**
+         * Determine if a given view exists
+         *
+         * @param string $view
+         * @return bool
+         */
+        public static function exists(string $view): bool
+        {
+            return Blade::exists($view);
+        }
+
+        /**
+         * Get the first view that actually exists from the given list.
+         *
+         * @param array $views The views to look for
+         * @param array $data The parameters to pass to the view
+         * @param array $mergeData The extra data to merge
+         *
+         * @return \Illuminate\Contracts\View\View The generated view
+         */
+        public static function first(array $views, $data = [], $mergeData = []): \Illuminate\Contracts\View\View
+        {
+            return Blade::first($views, $data, $mergeData);
+        }
+
     }
-
-    /**
-     * Get the Blade instance for View
-     *
-     * @return Blade|null
-     */
-    public static function blade(): ?Blade
-    {
-        $instance = static::getInstance();
-
-        return $instance->blade;
-    }
-
-    /**
-     * Render (return) the template view
-     *
-     * @see https://laravel.com/docs/views#creating-and-rendering-views
-     *
-     * @param string $view
-     * @param array $data
-     * @return string
-     * @throws MissingPackageException
-     * @throws \ReflectionException
-     */
-    public static function render(string $view, array $data = []): string
-    {
-        $viewName = static::getInstance()->getViewTemplateName($view);
-        return static::getInstance()->blade->render($viewName, $data);
-    }
-
-    public static function composer(string $key, $value): array
-    {
-        return static::getInstance()->blade->composer($key, $value);
-    }
-
-    /**
-     * Make the view instance.
-     * You can use this for other views
-     *
-     * @see https://laravel.com/docs/views#creating-and-rendering-views
-     *
-     * @param $view
-     * @param array $data
-     * @return \Illuminate\Contracts\View\View
-     * @throws MissingPackageException
-     * @throws \ReflectionException
-     */
-    public static function make($view, $data = []): \Illuminate\Contracts\View\View
-    {
-        $viewName = static::getInstance()->getViewTemplateName($view);
-
-        return static::getInstance()->blade->make($viewName, $data);
-    }
-
-    /**
-     * Determine if a given view exists
-     *
-     * @param $view
-     * @return bool
-     * @throws MissingPackageException
-     * @throws \ReflectionException
-     */
-    public static function exists($view): bool
-    {
-        $viewName = static::getInstance()->getViewTemplateName($view);
-
-        return static::getInstance()->blade->exists(($viewName));
-    }
-
-}

@@ -1,121 +1,90 @@
 # Views
 
-This package adds Laravel Blade to WordPress.
+Laravel blade and view for WordPress with custom directives.
 
-You can use `Morningtrain\WP\View\View` the same way as you would use the View class in Laravel.
+## Table of Contents
 
-To render a view in a non-blade context use the View::render method.
+- [Introduction](#introduction)
+- [Getting Started](#getting-started)
+    - [Installation](#installation)
+- [Dependencies](#dependencies)
+    - [illuminate/view](https://github.com/illuminate/view)
+    - [morningtrain/php-loader](#morningtrainphp-loader)
+- [Usage](#usage)
+- [Credits](#credits)
+- [License](#license)
+
+# Introduction
+
+## Getting Started
+
+To get started install the package as described below in [Installation](#installation).
+
+To use the tool have a look at [Usage](#usage)
+
+### Installation
+
+Install with composer
+
+```bash
+composer require morningtrain/wp-view
+```
+
+## Dependencies
+
+### illuminate/view
+
+[illuminate/view](https://github.com/illuminate/view)
+
+### morningtrain/php-loader
+
+[PHP Loader](https://github.com/Morning-Train/php-loader) is used to load and initialize all Hooks
+
+## Usage
+
+### Registering a route
+
+To register a route call the method on the Route class with the request type you want and supply a callback
 
 ```php
-// In Controller, Hook or WordPress template file
-use Morningtrain\WP\View\View;
-// This will render the person view with the variable $name set as "John Edward"
-// Views must be placed in the /views directory. To render a view from a sub directory to /view simply use the full path: eg. pages/contact
-echo View::render('person',['name' => 'John Edward']);
+// Register a route on mysite.com/myroute that accepts GET requests
+\Morningtrain\WP\Route\Route::get('/myroute',[MyRouteController::class,'view']);
+// Same but for POST requests
+\Morningtrain\WP\Route\Route::get('/myroute',[MyRouteController::class,'update']);
+// A list of allowed request types
+\Morningtrain\WP\Route\Route::match(['POST','PUT'],'/myroute',[MyRouteController::class,'update']);
+// Any request type
+\Morningtrain\WP\Route\Route::any('/myroute',MyRouteController::class);
+
 ```
 
-```html
-<!-- Views/person.blade.php -->
-<aside class="person">
-    {{ $name }}
-</aside>
-```
+### Naming a route
 
-## Directives
-
-We support basic Blade directives.
-
-### Auth
-
-Checks current user capabilities Note: that @auth uses is_user_logged_in and current_use_can()
-
-```html
-@auth
-<p>User is logged in</p>
-@else
-<p>User is NOT logged in</p>
-@endauth
-```
-
-@auth takes an optional param. If set current user MUST have this capability.
-
-```html
-@auth('administrator')
-<p>Hello Admin!</p>
-@endauth
-```
-
-### @react
-Outputs markup ready for react initialization using our React Renderer
-```html
-@react('MyComponent', ['someProp' => 'some value'])
-// Will return: 
-<div data-react-class="MyComponent" data-react-props='{"someProp": "some value"}'></div>
-```
-### @username
-
-```html
-@auth
-<p>Hej <strong>@username</strong></p>
-@else
-<a href="{!! wp_login_url() !!}">Log ind</a>
-@endauth
-```
-
-### @header & @footer
-
-Loads the header or footer view from /views.
-
-Same as WordPress inbuilt [get_header()](https://developer.wordpress.org/reference/functions/get_header/)
-and [get_footer()](https://developer.wordpress.org/reference/functions/get_footer/)
-
-```html
-@header
-// @header(small) for loading views/header-small.blade.php in views
-<main>
-    ... some content here
-</main>
-@footer
-```
-
-### @get_field
-
-```html
-<p>Phone: @get_field(phone_number)</p>
-```
-
-## View Composers
-
-You can use view [composing](https://laravel.com/docs/9.x/views#view-composers)!!
-It is recommended that you do this in a Hook using init on a lower priority than 10.
+You can name a route so that you may identify it again later
 
 ```php
-\Morningtrain\WP\View\View::composer('footer',function ($view){
-                $view->with('menu_items', [
-                    'Home'=> home_url(),
-                    'Kontakt'=> '/kontakt',
-                ]);
-            });
+\Morningtrain\WP\Route\Route::get('/myroute',[MyRouteController::class,'view'])
+    ->name('myroute');
 ```
 
-## Packages
-
-To use views in a package you must first register your package into View.
+### Getting current route
 
 ```php
-// PackageClass.php
-class PackageClass{
-    public static function init(){
-        View::loadViewsFrom(__DIR__ . "/Views",'my-package');
-    } 
-}
+$route = \Morningtrain\WP\Route\Route::current();
 ```
 
-To use a template from a package, whether you are working in this package or in the project use:
+### Getting route URL
 
 ```php
-    View::render('my-package::person',['name' => 'Svante']);
+$routeUrl = \Morningtrain\WP\Route\Route::route('myroute'); // site.com/myroute
 ```
 
-If you need to use a custom template instead of the one the package introduces then you can simply add your own template
-in your project eg. `Views/vendors/my-package/person.blade.php`
+## Credits
+
+- [Mathias Munk](https://github.com/mrmoeg)
+- [Martin Schadegg Brønniche](https://github.com/mschadegg)
+- [All Contributors](../../contributors)
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE) for more information.

@@ -1,12 +1,18 @@
 {
   "name": "morningtrain/wp-view",
-  "description": "Views using blade",
+  "description": "Laravel views and blade for WordPress",
+  "keywords": [
+    "wordpress",
+    "morningtrain",
+    "blade",
+    "view",
+    "templating"
+  ],
   "minimum-stability": "stable",
-  "license": "proprietary",
-  "version": "v0.2.2",
+  "license": "MIT",
   "authors": [
     {
-      "name": "Morningtrain",
+      "name": "Mathias Munk",
       "email": "mh@morningtrain.dk"
     },
     {
@@ -20,6 +26,7 @@
     }
   },
   "require": {
-    "illuminate/view": "^9.5"
+      "illuminate/view": "^9.5",
+    "morningtrain/php-loader": "^0.3.0"
   }
 }

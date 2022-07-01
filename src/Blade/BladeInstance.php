@@ -381,6 +381,20 @@ class BladeInstance implements BladeInterface
         return $this->getViewFactory()->file($path, $data, $mergeData);
     }
 
+    /**
+     * Get the first view that actually exists from the given list.
+     *
+     * @param array $views The views to look for
+     * @param array $data The parameters to pass to the view
+     * @param array $mergeData The extra data to merge
+     *
+     * @return ViewInterface The generated view
+     */
+    public function first(array $views, $data = [], $mergeData = []): ViewInterface
+    {
+        return $this->getViewFactory()->first($views, $data, $mergeData);
+    }
+
 
     /**
      * Generate a view.
