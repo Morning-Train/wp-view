@@ -42,41 +42,18 @@ composer require morningtrain/wp-route
 
 ## Usage
 
-### Registering a route
+### View directory
 
-To register a route call the method on the Route class with the request type you want and supply a callback
+To set the main directory for views
 
 ```php
-// Register a route on mysite.com/myroute that accepts GET requests
-\Morningtrain\WP\Route\Route::get('/myroute',[MyRouteController::class,'view']);
-// Same but for POST requests
-\Morningtrain\WP\Route\Route::get('/myroute',[MyRouteController::class,'update']);
-// A list of allowed request types
-\Morningtrain\WP\Route\Route::match(['POST','PUT'],'/myroute',[MyRouteController::class,'update']);
-// Any request type
-\Morningtrain\WP\Route\Route::any('/myroute',MyRouteController::class);
-
+\Morningtrain\WP\View\View::setup(__DIR__ . "/resources/views");
 ```
 
-### Naming a route
-
-You can name a route so that you may identify it again later
+### Render a view 
 
 ```php
-\Morningtrain\WP\Route\Route::get('/myroute',[MyRouteController::class,'view'])
-    ->name('myroute');
-```
-
-### Getting current route
-
-```php
-$route = \Morningtrain\WP\Route\Route::current();
-```
-
-### Getting route URL
-
-```php
-$routeUrl = \Morningtrain\WP\Route\Route::route('myroute'); // site.com/myroute
+echo \Morningtrain\WP\View\View::render('person',['name' => 'John','email' => 'john@doe.com']);
 ```
 
 ## Credits
