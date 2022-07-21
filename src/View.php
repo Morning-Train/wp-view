@@ -69,6 +69,7 @@
 
         /**
          * Render (return) the template view
+         * If $view is namespaced render will first look for the view in root directory/vendor/namespace/view
          *
          * @see https://laravel.com/docs/views#creating-and-rendering-views
          *
@@ -81,6 +82,10 @@
          */
         public static function render(string $view, array $data = []): string
         {
+            if (str_contains($view, '::')) {
+                [$namespace, $viewname] = explode('::', $view, 2);
+                return static::first(["vendor/{$namespace}/{$viewname}", $view], $data);
+            }
             return Blade::render($view, $data);
         }
 
