@@ -9,6 +9,7 @@
     use Morningtrain\WP\View\Blade\BladeInstance;
     use Morningtrain\WP\View\Blade\BladeInterface;
     use Morningtrain\WP\View\Classes\BladeHelper;
+    use Morningtrain\WP\View\Classes\Directives;
     use Morningtrain\WP\View\Exceptions\MissingPackageException;
 
     /**
@@ -42,7 +43,7 @@
 
             Blade::setInstance(new BladeInstance(static::$baseDir, static::$cacheDir));
 
-            Loader::create(__DIR__ . '/directives');
+            Directives::register();
         }
 
         /**
