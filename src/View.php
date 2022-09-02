@@ -55,6 +55,9 @@
          */
         public static function addNamespace(string $namespace, string $path): BladeInterface
         {
+            if (Blade::getInstance() === null) {
+                static::setup($path);
+            }
             return Blade::addNamespace($namespace, $path);
         }
 
