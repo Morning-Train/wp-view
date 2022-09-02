@@ -9,9 +9,9 @@
         public static function register()
         {
             $class = static::class;
-            Blade::if('auth', [static::class, 'auth']);
-            Blade::directive('footer', fn(string $expression) => "<?php {$class}::footer({$expression}); ?>");
+            Blade::if('wpauth', [static::class, 'wpauth']);
             Blade::directive('header', fn(string $expression) => "<?php {$class}::header({$expression}); ?>");
+            Blade::directive('footer', fn(string $expression) => "<?php {$class}::footer({$expression}); ?>");
             Blade::directive('react', fn(string $expression) => "<?php {$class}::react({$expression}); ?>");
             Blade::directive('script', fn(string $expression) => "<?php {$class}::script({$expression}); ?>");
             Blade::directive('style', fn(string $expression) => "<?php {$class}::style({$expression}); ?>");
@@ -28,7 +28,7 @@
          * @param string|null $capability If supplied current user MUST have this capability else a simple is_user_logged_in() is used
          * @return bool
          */
-        public static function auth(?string $capability = null): bool
+        public static function wpauth(?string $capability = null): bool
         {
             return $capability === null ? \is_user_logged_in() : \current_user_can($capability);
         }
