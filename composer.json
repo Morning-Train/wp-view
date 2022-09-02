@@ -26,7 +26,7 @@
     }
   },
   "require": {
-      "illuminate/view": "^8.83|^9.5",
+    "illuminate/view": "^8.83|^9.5",
     "morningtrain/php-loader": "^0.3.3"
   }
 }
