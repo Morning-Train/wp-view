@@ -11,19 +11,19 @@ Laravel blade and view for WordPress with custom directives.
     - [illuminate/view](https://github.com/illuminate/view)
     - [morningtrain/php-loader](#morningtrainphp-loader)
 - [Usage](#usage)
-  - [View directory](#view-directory)
-  - [Render a view](#render-a-view)
-  - [Working with namespaces](#working-with-namespaces)
-    - [Registering a namespace](#registering-a-namespace)
-    - [Using a namespace](#using-a-namespace)
-  - [Custom @directives](#custom-directives)
-    - [@wpauth()](#wpauth)
-    - [@header()](#header)
-    - [@footer()](#footer)
-    - [@script()](#script)
-    - [@style()](#style)
-    - [@username()](#username)
-    - [@react()](#react)
+    - [View directory](#view-directory)
+    - [Render a view](#render-a-view)
+    - [Working with namespaces](#working-with-namespaces)
+        - [Registering a namespace](#registering-a-namespace)
+        - [Using a namespace](#using-a-namespace)
+    - [Custom @directives](#custom-directives)
+        - [@wpauth()](#wpauth)
+        - [@header()](#header)
+        - [@footer()](#footer)
+        - [@script()](#script)
+        - [@style()](#style)
+        - [@username()](#username)
+        - [@react()](#react)
 - [Credits](#credits)
 - [License](#license)
 
@@ -110,24 +110,29 @@ This package contains some custom [blade directives](https://laravel.com/docs/bl
 ```
 
 #### @header()
+
 Acts the same as : https://developer.wordpress.org/reference/functions/get_header/
 
-The following will render the `header.blade.php` view or `header-small.blade.php`  
+The following will render the `header.blade.php` view or `header-small.blade.php`
+
 ```php
 @header()
 @header('small')
 ```
 
 #### @footer()
+
 Acts the same as : https://developer.wordpress.org/reference/functions/get_footer/
 
 The following will render the `footer.blade.php` view or `footer-dark.blade.php`
+
 ```php
 @footer()
 @footer('dark')
 ```
 
 #### @script()
+
 An easy way to enqueue an already registered script.
 
 Using this directive is the same as calling `wp_enqueue_script()` with only the handle.
@@ -140,6 +145,7 @@ Using this directive is the same as calling `wp_enqueue_script()` with only the 
 ```
 
 #### @style()
+
 An easy way to enqueue an already registered stylesheet.
 
 Using this directive is the same as calling `wp_enqueue_style()` with only the handle.
@@ -150,18 +156,31 @@ Using this directive is the same as calling `wp_enqueue_style()` with only the h
   ...
 </section>
 ```
+
 #### @username()
+
 Prints the username of the currently logged in user or an empty string if no one is logged in.
 
 #### @react()
 
-Prints a Morningtrain ReactRenderer compatible element with optional props.
-This makes it easy to prepare components for react to handle in the client.
+Prints a Morningtrain ReactRenderer compatible element with optional props. This makes it easy to prepare components for
+react to handle in the client.
 
 ```php
 @react('myComponent', [
 'someData' => 'someValue'
 ])
+```
+
+The @react directive also supports a child view that will be rendered inside the component-wrapper until the react
+component is rendered. This is especially useful for skeletons and to avoid popping ins.
+
+```php
+@react('myComponent', [
+'someData' => 'someValue'
+],
+'my-skeleton-view'),
+['skeletonProp' => 'skeletonValue']
 ```
 
 ## Credits
