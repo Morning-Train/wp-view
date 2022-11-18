@@ -11,6 +11,7 @@
         private array $props;
         private string $markup = '';
         private array $options;
+        private string $innerHtml = '';
 
         /**
          * ReactComponent constructor.
@@ -19,11 +20,16 @@
          * @param array $props
          * @param array $options
          */
-        public function __construct(string $componentName, array $props = [], array $options = [])
-        {
+        public function __construct(
+            string $componentName,
+            array $props = [],
+            array $options = [],
+            string $innerHtml = ''
+        ) {
             $this->componentName = $componentName;
             $this->props = $props;
             $this->options = $options;
+            $this->innerHtml = $innerHtml;
         }
 
         /**
@@ -34,9 +40,13 @@
          *
          * @return static
          */
-        public static function create(string $componentName, array $props = [], array $options = []): static
-        {
-            return new static($componentName, $props, $options);
+        public static function create(
+            string $componentName,
+            array $props = [],
+            array $options = [],
+            string $innerHtml = ''
+        ): static {
+            return new static($componentName, $props, $options, $innerHtml);
         }
 
         private function toHtml(): string
@@ -53,7 +63,7 @@
 
             $attrs = $this->toHtmlAttributesString($options);
 
-            return "<{$tag} data-react-class=\"{$this->componentName}\" data-react-props=\"$props\" $attrs></$tag>";
+            return "<{$tag} data-react-class=\"{$this->componentName}\" data-react-props=\"$props\" $attrs>{$this->innerHtml}</$tag>";
         }
 
         protected function toHtmlAttributesString(array $attributes): string
@@ -85,13 +95,24 @@
             return $this;
         }
 
+        public function innerHtml(string $html): static
+        {
+            $this->innerHtml = $html;
+
+            return $this;
+        }
+
         public function __destruct()
         {
             $this->toHtml();
         }
 
-        public static function render(string $componentName, array $props = [], array $options = []): string
-        {
-            return self::create($componentName, $props, $options)->toHtml();
+        public static function render(
+            string $componentName,
+            array $props = [],
+            array $options = [],
+            string $innerHtml = ''
+        ): string {
+            return self::create($componentName, $props, $options, $innerHtml)->toHtml();
         }
     }

@@ -74,9 +74,18 @@
          * @param array $props
          * @param array $options
          */
-        public static function react(string $component, $props = [], $options = [])
-        {
-            echo \Morningtrain\WP\View\Classes\ReactComponent::render($component, $props, $options);
+        public static function react(
+            string $component,
+            array $props = [],
+            ?string $childView = null,
+            array $childViewData = []
+        ) {
+            if ($childView === null) {
+                $innerHtml = '';
+            } else {
+                $innerHtml = \Morningtrain\WP\View\View::render($childView, $childViewData);
+            }
+            echo \Morningtrain\WP\View\Classes\ReactComponent::render($component, $props, [], $innerHtml);
         }
 
         /**
