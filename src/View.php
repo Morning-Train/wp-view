@@ -88,7 +88,7 @@
         {
             if (str_contains($view, '::')) {
                 [$namespace, $viewname] = explode('::', $view, 2);
-                return static::first(["vendor/{$namespace}/{$viewname}", $view], $data);
+                return static::first(["vendor/{$namespace}/{$viewname}", $view], $data)->render();
             }
             return Blade::render($view, $data);
         }
