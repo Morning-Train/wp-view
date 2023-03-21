@@ -96,12 +96,12 @@
         /**
          * Register a composer.
          *
-         * @param string $key The name of the composer to register
+         * @param string|array $key The name(s) of the composer to register
          * @param mixed $value The closure or class to use
          *
          * @return array
          */
-        public static function composer(string $key, $value): array
+        public static function composer(string|array $key, $value): array
         {
             return Blade::composer($key, $value);
         }
