@@ -154,24 +154,4 @@
                 }
  ?>");
         }
-
-        public static function cache(string $cacheKey, int $cacheLifetime = 0)
-        {
-            $cache = \get_transient($cacheKey);
-            if ($cache !== false) {
-                echo $cache;
-                return;
-            }
-            $__cacheKey = $cacheKey;
-            $__cacheLifetime = $cacheLifetime;
-            ob_start();
-        }
-
-        public static function endcache()
-        {
-            $__cacheContent = ob_get_clean();
-            \set_transient($__cacheKey, $__cacheContent, $__cacheLifetime);
-            echo $__cacheContent;
-            unset($__cacheContent, $__cacheKey, $__cacheLifetime);
-        }
     }
