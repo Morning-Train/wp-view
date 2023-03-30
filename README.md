@@ -23,6 +23,7 @@ Laravel blade and view for WordPress with custom directives.
         - [@script()](#script)
         - [@style()](#style)
         - [@username()](#username)
+        - [@cache()](#cache)
         - [@react()](#react)
 - [Credits](#credits)
 - [License](#license)
@@ -160,6 +161,29 @@ Using this directive is the same as calling `wp_enqueue_style()` with only the h
 #### @username()
 
 Prints the username of the currently logged in user or an empty string if no one is logged in.
+
+#### @cache()
+
+Caches content in a transient and uses the cached data if it exists
+
+```php
+<div>
+    <h3>Cache test for post: {!! $postId !!}</h3>
+    @if(!empty($postId))
+        @cache("post_card_{$postId}")
+        <aside @class(['post-card', "post-card__".get_post_type($postId)])>
+            <h3>{!! get_the_title($postId) !!}</h3>
+            <p>{{ get_the_excerpt($postId) }}</p>
+            <span>Yes</span>
+            <a href="{!! get_permalink($postId) !!}">{{__('Read more','domain')}}</a>
+        </aside>
+        @endcache
+    @else
+        <p>{{__('This is not a post','domain')}}</p>
+    @endif
+</div>
+
+```
 
 #### @react()
 
