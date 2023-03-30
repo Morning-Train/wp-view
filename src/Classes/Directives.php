@@ -16,6 +16,8 @@
             Blade::directive('script', fn(string $expression) => "<?php {$class}::script({$expression}); ?>");
             Blade::directive('style', fn(string $expression) => "<?php {$class}::style({$expression}); ?>");
             Blade::directive('username', fn() => "<?php {$class}::username(); ?>");
+
+            static::registerCacheDirective();
         }
 
         /**
@@ -117,5 +119,59 @@
         public static function username()
         {
             echo is_user_logged_in() ? wp_get_current_user()->display_name : '';
+        }
+
+        /**
+         * Registers directive for caching content.
+         * Cached content is stored as transients and should be handled as such
+         */
+        protected static function registerCacheDirective()
+        {
+            // @cache(string $cacheKey, int $cacheLifetime = 0)
+            Blade::directive('cache', fn(string $expression) => "<?php 
+                \$__cache_directive_arguments = [{$expression}];
+                if (count(\$__cache_directive_arguments) === 2) {
+                    [\$__cache_directive_key, \$__cache_directive_ttl] = \$__cache_directive_arguments;
+                } else {
+                    [\$__cache_directive_key] = \$__cache_directive_arguments;
+                    \$__cache_directive_ttl = 0;
+                }
+                \$__cache = \get_transient(\$__cache_directive_key);
+                if (\$__cache !== false) {
+                    echo \$__cache;
+                }else{
+                    ob_start();
+            ?>");
+
+            Blade::directive('endcache', fn() => "<?php 
+                    \$__cache_directive_buffer = ob_get_clean();
+                    
+                     \set_transient(\$__cache_directive_key, \$__cache_directive_buffer, \$__cache_directive_ttl);
+                    
+                    echo \$__cache_directive_buffer;
+                    
+                    unset(\$__cache_directive_key, \$__cache_directive_ttl, \$__cache_directive_buffer, \$__cache_directive_arguments, \$__cache);
+                }
+ ?>");
+        }
+
+        public static function cache(string $cacheKey, int $cacheLifetime = 0)
+        {
+            $cache = \get_transient($cacheKey);
+            if ($cache !== false) {
+                echo $cache;
+                return;
+            }
+            $__cacheKey = $cacheKey;
+            $__cacheLifetime = $cacheLifetime;
+            ob_start();
+        }
+
+        public static function endcache()
+        {
+            $__cacheContent = ob_get_clean();
+            \set_transient($__cacheKey, $__cacheContent, $__cacheLifetime);
+            echo $__cacheContent;
+            unset($__cacheContent, $__cacheKey, $__cacheLifetime);
         }
     }
